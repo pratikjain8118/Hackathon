@@ -1,0 +1,72 @@
+
+
+code1.cbl
+
+Explanation:
+- The code is a COBOL program that connects to a DB2 database and performs SQL queries on data related to gender, alive status, and age.
+- The program also calculates statistics and displays graphs.
+- The code is written in a legacy version of Visual Studio Code without the GNUCOBOL extension.
+- The code takes arguments from a JCL file to print statistics for the last 120 years with 10-year intervals as the default.
+- The code assumes that the DB2 database has variables for date, gender, and alive status.
+
+Business Rules:
+- The code assumes that the DB2 database has variables for date, gender (M or F), and alive status (A or D).
+- The code takes arguments from a JCL file to specify the table configurations for the statistics.
+- The code has two modes for SQL queries: one that retrieves multiple rows for all nakshatras and one that retrieves one row for each nakshatra.
+- The code calculates statistics for the last 120 years with 10-year intervals as the default.
+
+Test Case:
+| Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result |
+|-------------|---------------|-----------|---------------|------------|-----------|-----------------|
+| TC001       | SQL Mode      | Positive  | SQL mode is selected in JCL file | 1. Run the code with JCL file specifying SQL mode | JCL file with SQL mode | Statistics and graphs are displayed |
+| TC002       | Dataset Mode  | Positive  | Dataset mode is selected in JCL file | 1. Run the code with JCL file specifying Dataset mode | JCL file with Dataset mode | Statistics and graphs are displayed |
+| TC003       | Invalid Mode  | Negative  | Invalid mode is selected in JCL file | 1. Run the code with JCL file specifying Invalid mode | JCL file with Invalid mode | Error message is displayed |
+| TC004       | Missing JCL   | Negative  | JCL file is missing | 1. Run the code without JCL file | - | Error message is displayed |
+| TC005       | Invalid DB2   | Negative  | DB2 database is not available | 1. Run the code with JCL file specifying SQL mode | JCL file with SQL mode | Error message is displayed |
+
+code3.cbl
+
+Explanation:
+- This code is a COBOL program that reads input records from a file and writes output records to another file.
+- It defines two file sections, InputFile and OutputFile, with their respective record structures.
+- It also defines a working storage section with an ErrorMessage variable.
+- The main procedure division contains the MAIN-PARAGRAPH paragraph, which opens the input and output files, performs a loop to read input records until the end of file is reached, and then closes the files and stops the program.
+- The READ-INPUT-RECORD paragraph is called within the loop to read input records. If the end of file is reached, it moves "EOF" to the InputRecord variable. Otherwise, it performs the PROCESS-DATA paragraph.
+- The PROCESS-DATA paragraph moves the values from the input fields to the corresponding output fields and writes the output record. It then calls the READ-INPUT-RECORD paragraph again to read the next input record.
+
+Business Rules:
+- The program processes input records and generates output records based on the defined file structures.
+- It assumes that the input file exists and contains valid records.
+- It writes the output records to the output file.
+- It stops processing when the end of file is reached.
+
+Test Case:
+| Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result |
+|-------------|---------------|-----------|---------------|------------|-----------|-----------------|
+| TC001       | Normal Case   | Read and write records | Input file and output file exist | 1. Open input and output files<br>2. Read input record<br>3. Process data and write output record<br>4. Repeat steps 2-3 until end of file<br>5. Close input and output files<br>6. Stop program | Input file with multiple records | Output file contains corresponding output records |
+| TC002       | Empty Input File | Read and write records | Input file exists but is empty | 1. Open input and output files<br>2. Read input record<br>3. Stop program | Empty input file | No output records in the output file |
+| TC003       | Missing Input File | Read and write records | Input file does not exist | 1. Stop program | N/A | Error message: "Input file not found" |
+
+code4.cbl
+
+Explanation:
+- This code is a COBOL program that calculates the gross pay for employees based on their hours worked and hourly rate.
+- It reads employee records from a file, processes each record, calculates the gross pay, and displays a payroll report.
+- The program keeps track of the total gross pay and the number of employees processed.
+- It uses various data items and variables to store employee information and perform calculations.
+- The program uses a loop to read and process each employee record until the end of the file is reached.
+
+Business Rules:
+- The program assumes that the employee file is in a specific format with comma-separated values.
+- The employee file should contain the following fields: employee name, employee ID, hours worked, and hourly rate.
+- The program calculates the gross pay by multiplying the hours worked by the hourly rate.
+- The program displays the employee name, employee ID, and gross pay for each employee.
+- The program also displays the total gross pay and the total number of employees processed.
+
+Test Case:
+| Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result |
+|-------------|---------------|-----------|---------------|------------|-----------|-----------------|
+| TC001       | Valid Input   | Calculate gross pay for an employee | Employee file is available | 1. Provide a valid employee record with hours worked and hourly rate | Employee Name: John Doe, Employee ID: 123456, Gross Pay: 100.00 | Gross pay is calculated correctly |
+| TC002       | Invalid Input | Calculate gross pay for an employee | Employee file is available | 1. Provide an invalid employee record with missing hours worked or hourly rate | Error message: Invalid employee record | Error message is displayed |
+| TC003       | Empty File    | Calculate gross pay for an employee | Employee file is empty | 1. Provide an empty employee file | Error message: No employee records found | Error message is displayed |
+| TC004       | End of File   | Calculate gross pay for an employee | End of employee file is reached | 1. Provide employee records until the end of the file is reached | Total Gross Pay: 1000.00, Total Employees: 10 | Total gross pay and total employees are displayed correctly |

@@ -124,7 +124,7 @@ if __name__ == "__main__":
         fileName  = item[0].split('\\')[-1]
         # fileName = fileName.split('.')[0]
         fileName = fileName.split('_split')[0]
-        with open(f"output/output_test.txt", 'a') as f:
+        with open(f"output/output_test.txt", 'w') as f:
             f.write('\n')
             f.write('\n')
             f.write(fileName)
