@@ -1,72 +1,50 @@
 
 
-code1.cbl
-
-Explanation:
-- The code is a COBOL program that connects to a DB2 database and performs SQL queries on data related to gender, alive status, and age.
-- The program also calculates statistics and displays graphs.
-- The code is written in a legacy version of Visual Studio Code without the GNUCOBOL extension.
-- The code takes arguments from a JCL file to print statistics for the last 120 years with 10-year intervals as the default.
-- The code assumes that the DB2 database has variables for date, gender, and alive status.
-
-Business Rules:
-- The code assumes that the DB2 database has variables for date, gender (M or F), and alive status (A or D).
-- The code takes arguments from a JCL file to specify the table configurations for the statistics.
-- The code has two modes for SQL queries: one that retrieves multiple rows for all nakshatras and one that retrieves one row for each nakshatra.
-- The code calculates statistics for the last 120 years with 10-year intervals as the default.
-
-Test Case:
-| Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result |
-|-------------|---------------|-----------|---------------|------------|-----------|-----------------|
-| TC001       | SQL Mode      | Positive  | SQL mode is selected in JCL file | 1. Run the code with JCL file specifying SQL mode | JCL file with SQL mode | Statistics and graphs are displayed |
-| TC002       | Dataset Mode  | Positive  | Dataset mode is selected in JCL file | 1. Run the code with JCL file specifying Dataset mode | JCL file with Dataset mode | Statistics and graphs are displayed |
-| TC003       | Invalid Mode  | Negative  | Invalid mode is selected in JCL file | 1. Run the code with JCL file specifying Invalid mode | JCL file with Invalid mode | Error message is displayed |
-| TC004       | Missing JCL   | Negative  | JCL file is missing | 1. Run the code without JCL file | - | Error message is displayed |
-| TC005       | Invalid DB2   | Negative  | DB2 database is not available | 1. Run the code with JCL file specifying SQL mode | JCL file with SQL mode | Error message is displayed |
-
 code3.cbl
 
-Explanation:
-- This code is a COBOL program that reads input records from a file and writes output records to another file.
-- It defines two file sections, InputFile and OutputFile, with their respective record structures.
-- It also defines a working storage section with an ErrorMessage variable.
-- The main procedure division contains the MAIN-PARAGRAPH paragraph, which opens the input and output files, performs a loop to read input records until the end of file is reached, and then closes the files and stops the program.
-- The READ-INPUT-RECORD paragraph is called within the loop to read input records. If the end of file is reached, it moves "EOF" to the InputRecord variable. Otherwise, it performs the PROCESS-DATA paragraph.
-- The PROCESS-DATA paragraph moves the values from the input fields to the corresponding output fields and writes the output record. It then calls the READ-INPUT-RECORD paragraph again to read the next input record.
-
 Business Rules:
-- The program processes input records and generates output records based on the defined file structures.
-- It assumes that the input file exists and contains valid records.
-- It writes the output records to the output file.
-- It stops processing when the end of file is reached.
+Business Rules:
+1. The program reads data from an input file and writes the processed data to an output file.
+2. The input file must be opened for reading and the output file must be opened for writing.
+3. The program continues to read input records until it encounters the end of file marker ("EOF").
+4. Each input record consists of three fields: Field1, Field2, and Field3.
+5. Each output record consists of three result fields: ResultField1, ResultField2, and ResultField3.
+6. The program processes the data by copying the values from the input fields to the corresponding result fields.
+7. After processing each input record, the program writes the output record to the output file.
+8. If an error occurs during the execution of the program, an error message can be stored in the ErrorMessage variable.
+9. The program stops running after all input records have been processed and written to the output file.
 
-Test Case:
-| Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result |
-|-------------|---------------|-----------|---------------|------------|-----------|-----------------|
-| TC001       | Normal Case   | Read and write records | Input file and output file exist | 1. Open input and output files<br>2. Read input record<br>3. Process data and write output record<br>4. Repeat steps 2-3 until end of file<br>5. Close input and output files<br>6. Stop program | Input file with multiple records | Output file contains corresponding output records |
-| TC002       | Empty Input File | Read and write records | Input file exists but is empty | 1. Open input and output files<br>2. Read input record<br>3. Stop program | Empty input file | No output records in the output file |
-| TC003       | Missing Input File | Read and write records | Input file does not exist | 1. Stop program | N/A | Error message: "Input file not found" |
+Test Cases:
+Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result
+------------|---------------|-----------|---------------|-------------|-----------|-----------------
+1           | Normal Input  | Read-Input-Record | InputFile is open | 1. Read InputRecord from InputFile | InputRecord = "EOF" | Move "EOF" to InputRecord
+2           | Normal Input  | Process-Data | InputRecord is not "EOF" | 1. Move Field1 to ResultField1 2. Move Field2 to ResultField2 3. Move Field3 to ResultField3 4. Write OutputRecord | - | ResultField1 = Field1, ResultField2 = Field2, ResultField3 = Field3
+3           | End of File   | Read-Input-Record | InputFile is open | 1. Read InputRecord from InputFile | InputRecord = "EOF" | Move "EOF" to InputRecord
+4           | Empty Input   | Process-Data | InputRecord is not "EOF" | 1. Move Field1 to ResultField1 2. Move Field2 to ResultField2 3. Move Field3 to ResultField3 4. Write OutputRecord | Field1 = "", Field2 = 0, Field3 = "" | ResultField1 = "", ResultField2 = 0, ResultField3 = ""
+5           | Invalid Input | Process-Data | InputRecord is not "EOF" | 1. Move Field1 to ResultField1 2. Move Field2 to ResultField2 3. Move Field3 to ResultField3 4. Write OutputRecord | Field1 = "Invalid", Field2 = 123456, Field3 = "Invalid" | ResultField1 = "Invalid", ResultField2 = 123456, ResultField3 = "Invalid"
 
 code4.cbl
 
-Explanation:
-- This code is a COBOL program that calculates the gross pay for employees based on their hours worked and hourly rate.
-- It reads employee records from a file, processes each record, calculates the gross pay, and displays a payroll report.
-- The program keeps track of the total gross pay and the number of employees processed.
-- It uses various data items and variables to store employee information and perform calculations.
-- The program uses a loop to read and process each employee record until the end of the file is reached.
-
 Business Rules:
-- The program assumes that the employee file is in a specific format with comma-separated values.
-- The employee file should contain the following fields: employee name, employee ID, hours worked, and hourly rate.
-- The program calculates the gross pay by multiplying the hours worked by the hourly rate.
-- The program displays the employee name, employee ID, and gross pay for each employee.
-- The program also displays the total gross pay and the total number of employees processed.
+Business Rules:
+1. The program is designed to process payroll information for employees.
+2. The Employee-Record data structure contains fields for Employee Name, Employee ID, Hours Worked, Hourly Rate, and Gross Pay.
+3. The Total-Gross-Pay field is used to keep track of the total gross pay for all employees.
+4. The Employee-Count field is used to keep track of the total number of employees processed.
+5. The program reads employee records from a file named EmployeeFile.
+6. The file contains records with fields for Employee Name, Employee ID, Hours Worked, and Hourly Rate.
+7. The program processes each employee record by calculating the gross pay based on the hours worked and hourly rate.
+8. The gross pay is calculated by multiplying the hours worked by the hourly rate.
+9. The program displays the employee name, employee ID, and gross pay for each employee.
+10. After processing all employee records, the program displays the total gross pay and the total number of employees processed.
+11. The program stops running after displaying the payroll report.
 
-Test Case:
-| Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result |
-|-------------|---------------|-----------|---------------|------------|-----------|-----------------|
-| TC001       | Valid Input   | Calculate gross pay for an employee | Employee file is available | 1. Provide a valid employee record with hours worked and hourly rate | Employee Name: John Doe, Employee ID: 123456, Gross Pay: 100.00 | Gross pay is calculated correctly |
-| TC002       | Invalid Input | Calculate gross pay for an employee | Employee file is available | 1. Provide an invalid employee record with missing hours worked or hourly rate | Error message: Invalid employee record | Error message is displayed |
-| TC003       | Empty File    | Calculate gross pay for an employee | Employee file is empty | 1. Provide an empty employee file | Error message: No employee records found | Error message is displayed |
-| TC004       | End of File   | Calculate gross pay for an employee | End of employee file is reached | 1. Provide employee records until the end of the file is reached | Total Gross Pay: 1000.00, Total Employees: 10 | Total gross pay and total employees are displayed correctly |
+Test Cases:
+Test Case ID | Test Scenario | Test Case | Pre-Condition | Test Steps | Test Data | Expected Result
+------------|---------------|-----------|---------------|------------|-----------|----------------
+1           | Normal Case   | Calculate Gross Pay for a single employee | Employee file contains one record | 1. Open the EmployeeFile 2. Read the EmployeeFile record 3. Calculate Gross Pay 4. Display Payroll Report 5. Close the EmployeeFile | Employee-Name: John Doe, Employee-ID: 123456, Hours-Worked: 40, Hourly-Rate: 10.00 | Gross Pay: 400.00
+2           | Empty File    | Calculate Gross Pay for an empty employee file | Employee file is empty | 1. Open the EmployeeFile 2. Read the EmployeeFile record (AT END) 3. Set EOF-Flag to 'Y' 4. Calculate Gross Pay 5. Display Payroll Report 6. Close the EmployeeFile | - | Total Gross Pay: 0.00, Total Employees: 0
+3           | Multiple Employees | Calculate Gross Pay for multiple employees | Employee file contains multiple records | 1. Open the EmployeeFile 2. Read the EmployeeFile record (NOT AT END) 3. Process Employee Record 4. Calculate Gross Pay 5. Display Payroll Report 6. Repeat steps 2-5 until EOF-Flag is 'Y' 7. Close the EmployeeFile | Employee-Name: John Doe, Employee-ID: 123456, Hours-Worked: 40, Hourly-Rate: 10.00 Employee-Name: Jane Smith, Employee-ID: 654321, Hours-Worked: 35, Hourly-Rate: 12.50 | Gross Pay: 400.00, Gross Pay: 437.50, Total Gross Pay: 837.50, Total Employees: 2
+4           | Invalid Employee ID | Calculate Gross Pay for an employee with an invalid ID | Employee file contains one record with an invalid ID | 1. Open the EmployeeFile 2. Read the EmployeeFile record 3. Process Employee Record 4. Calculate Gross Pay 5. Display Payroll Report 6. Close the EmployeeFile | Employee-Name: John Doe, Employee-ID: ABC123, Hours-Worked: 40, Hourly-Rate: 10.00 | Error: Invalid Employee ID
+5           | Negative Hours Worked | Calculate Gross Pay for an employee with negative hours worked | Employee file contains one record with negative hours worked | 1. Open the EmployeeFile 2. Read the EmployeeFile record 3. Process Employee Record 4. Calculate Gross Pay 5. Display Payroll Report 6. Close the EmployeeFile | Employee-Name: John Doe, Employee-ID: 123456, Hours-Worked: -40, Hourly-Rate: 10.00 | Error: Negative Hours Worked
+6           | Zero Hourly Rate | Calculate Gross Pay for an employee with zero hourly rate | Employee file contains one record with zero hourly rate | 1. Open the EmployeeFile 2. Read the EmployeeFile record 3. Process Employee Record 4. Calculate Gross Pay 5. Display Payroll Report 6. Close the EmployeeFile | Employee-Name: John Doe, Employee-ID: 123456, Hours-Worked: 40, Hourly-Rate: 0.00 | Gross Pay: 0.00

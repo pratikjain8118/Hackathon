@@ -7,6 +7,13 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
+from langchain import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
 import tiktoken
 from langchain.prompts import ChatPromptTemplate
 from langchain.llms import OpenAI
@@ -90,6 +97,85 @@ def summarizeLargeCode(chat,filesInput):
     summary =response.content
     return (summary)
 
+def businessRulesPrompt(fileInput):
+    template_string = """I want you to act as a business user, you are given a COBOL program seperated by '''  \
+            Your job is to understand the program and provide some business rules(Business rule is a criterion used in business operations to guide behaviour, shape judgements and make decisions) associated to it.\
+            Avoid generating rules related to(do not show if these are not present in the program):\n \
+            1.File opening\n 2.when the imput or output files are open and closed\n 3.when the programs stops running\n 4.recommendations(Recommendations like Program Should)\n 5.File closing\n\
+            6.Do not include any redundant or repeated statements.\n \
+            Try to Mininmize the number of rules as much as possible. \
+            code='''{filesInput}'''"""
+    prompt_template = ChatPromptTemplate.from_template(template_string)
+    code_prompt = prompt_template.format_messages(
+                            filesInput=fileInput)
+    return code_prompt
+
+def testCaseRulesPrompt(fileInput):
+    template_string = """I want you to act as a Tester, you are given a COBOL program seperated by '''  \
+            Your job is to understand the program and provide test cases(Think of all possbile scenarios and edge cases) associated to it.
+            Output each testcase in the table with the following columns- 'Test Case ID','Test Scenario','Test Case','Pre-Condition','Test Steps','Test Data','Expected Result' 
+            code='''{filesInput}'''"""
+    prompt_template = ChatPromptTemplate.from_template(template_string)
+    code_prompt = prompt_template.format_messages(
+                            filesInput=fileInput)
+    return code_prompt
+
+def seqExplaination(code):
+    with open('./sample.cbl', 'r', errors="ignore") as f:
+        sample_program = f.read()
+
+    template = "I want you to act as a business user, I am showing you a sample cobal program along with it's Explaination.\
+    sample_program={sample_program}\
+    explainantion=\
+    1.This code is for an inventory management system, which helps businesses keep track of their products.\n \
+    2.Users can enter item details like code, name, and quantity to add items to the inventory.\n \
+    3.The system has a rule that limits the quantity of each item to 1000 units.\n \
+    4.If someone tries to add more than 1000 units of an item, the system will show an error message.\n \
+    5.The code also displays the current inventory, listing the item codes, names, and quantities that have been added.\n \
+    I want you to generate similar explainantion for the program I will send to a non technical user in simple english in maximum 5 points, "
+    system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+    human_template = "{code}"
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+
+    chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+
+    # chat_prompt.format_messages(sample_program=sample_program, code=code)
+    chat = ChatOpenAI(temperature=0)
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    response = chain.run(sample_program=sample_program, code=code)
+    print(response)
+
+def seqTest(code):
+    with open('./sample.cbl', 'r', errors="ignore") as f:
+        sample_program = f.read()
+
+    template = "I want you to act as a business user, I am showing you a sample cobal program along with it's Business rules.\
+    sample_program={sample_program}\
+    business_rules=\
+    1.The item quantity should not exceed the inventory limit, which is set to 1000 in this case.\n \
+    2.If the user tries to add an item with a quantity exceeding the limit, an error message is displayed.\n \
+    3.Otherwise, the item is added to the inventory, and the current inventory is displayed at the end.\n \
+    Avoid generating rules related to:\n \
+    1.File opening\n \
+    2.when the input or output files are open and closed\n \
+    3.when the programs stops running\n \
+    4.recommendations(Recommendations like Program Should)\n \
+    5.File closing\n \
+    6.Do not include any redundant or repeated statements.\n \
+    I want you to generate business rules in plain and simple language similar to above rules keeping in mind the rules to avoid for the program I will send.Genrate only 5 business rules"
+    system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+    human_template = "{code}"
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+
+    chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+
+    # chat_prompt.format_messages(sample_program=sample_program, code=code)
+    chat = ChatOpenAI(temperature=0)
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    response = chain.run(sample_program=sample_program, code=code)
+    print(response)
+
+
 if __name__ == "__main__":
     print("Here")
     chat = ChatOpenAI(temperature=0.0)
@@ -105,33 +191,45 @@ if __name__ == "__main__":
     # directory_path = './folder4/Cobol/OpenCobol'
     directory_path = './folder7'
     filesInput=read_files(directory_path)
+    for item in filesInput.items():
+        seqTest(item[1])
+        response = chat(businessRulesPrompt(item[1]))
+        # print('\n\n')
+        # print(response.content)
+        # seqExplaination(item[1])
     # print(read_files(directory_path));
     # directory_path = './folder5/python-telegram-bot'
     
-    for item in filesInput.items():
-        print(item[0])
-        summary=''
-        if (str(item[0])).find('_split')!= -1:
-            summary=summarizeLargeCode(chat,item[1])
-        else:
-            code_prompt = prompt_template.format_messages(
-                            filesInput=item)
-            # print(code_prompt)
-            response = chat(code_prompt)
-            summary=(response.content)
+    # for item in filesInput.items():
+    #     print(item[0])
+    #     summary=''
+    #     if (str(item[0])).find('_split')!= -1:
+    #         summary=summarizeLargeCode(chat,item[1])
+    #     else:
+    #         code_prompt = prompt_template.format_messages(
+    #                         filesInput=item)
+    #         # print(code_prompt)
+    #         # response = chat(code_prompt)
+    #         # summary=(response.content)
+    #         summary+='Business Rules:\n'
+    #         response = chat(businessRulesPrompt(item[1]))
+    #         summary+=(response.content)
+    #         summary+='\n\nTest Cases:\n'
+    #         response = chat(testCaseRulesPrompt(item[1]))
+    #         summary+=(response.content)
             
-        # print(item[0].split('\\')[-1])
-        fileName  = item[0].split('\\')[-1]
-        # fileName = fileName.split('.')[0]
-        fileName = fileName.split('_split')[0]
-        with open(f"output/output_test.txt", 'w') as f:
-            f.write('\n')
-            f.write('\n')
-            f.write(fileName)
-            f.write('\n')
-            f.write('\n')
-            f.write(summary)
-        #     # f.write("Test")
-        # print(response.content)
-        # print('\nNext File:\n')
-        time.sleep(20)
+    #     # print(item[0].split('\\')[-1])
+    #     fileName  = item[0].split('\\')[-1]
+    #     # fileName = fileName.split('.')[0]
+    #     fileName = fileName.split('_split')[0]
+    #     with open(f"output/output_test.txt", 'a') as f:
+    #         f.write('\n')
+    #         f.write('\n')
+    #         f.write(fileName)
+    #         f.write('\n')
+    #         f.write('\n')
+    #         f.write(summary)
+    #     #     # f.write("Test")
+    #     # print(response.content)
+    #     # print('\nNext File:\n')
+    #     time.sleep(60)
